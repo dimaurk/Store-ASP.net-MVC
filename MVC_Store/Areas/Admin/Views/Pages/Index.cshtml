@@ -1,0 +1,93 @@
+﻿@model IEnumerable<MVC_Store.Models.ViewModels.Pages.PageVM>
+
+@{
+    ViewBag.Title = "Pages";
+}
+
+<h2>Pages</h2>
+
+@if (TempData["SM"] != null)
+{
+    <div class = "alert alert-success">
+        @TempData["SM"]
+    </div>
+}
+
+<p>
+    @Html.ActionLink("Create New Page", "AddPage", "", new { @class = "btn btn-success"})
+</p>
+
+@if (!Model.Any())
+{
+    <h1 class="text-center">There are no pages.</h1>
+}
+
+<table class="table sorting" id="pages">
+    <tr class="home">
+        <th>
+           Title
+        </th>
+        <th>
+            Slug
+        </th>
+        <th>
+            Sidebar
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr id="id_@item.Id" class="@item.Slug">
+
+        <td>
+            @if (item.Slug != "home")
+            {
+                <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+            }
+            @Html.DisplayFor(modelItem => item.Title)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Slug)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.HasSidebar)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "EditPage", new { id=item.Id }, new { @class = "btn btn-primary" }) 
+            @Html.ActionLink("Details", "PageDetails", new { id=item.Id }, new { @class = "btn btn-warning" }) 
+            <!--If slug = home do not show delete button -->
+            @if (item.Slug != "home")
+            {
+            @Html.ActionLink("Delete", "DeletePage", new { id = item.Id }, new { @class = "delete btn btn-danger" })
+            }
+        </td>
+    </tr>
+}
+
+</table>
+
+@section Scripts
+{
+    <script>
+        $(function () {
+
+            //confirm page deletion
+            $("a.delete").click(function () {
+                if (!confirm("Confirm page deletion.")) return false;
+            });
+
+            //Sorting script
+            $("table#pages tbody").sortable({
+                items: "tr:not(.home)",
+                placeholder: "ui-state-highlight",
+                update: function () {
+                    var ids = $("table#pages tbody").sortable("serialize");
+                    var url = "/Admin/Pages/RecorderPages";
+
+                    $.post(url, ids, function (data) {
+                    });
+                }
+            });
+        });
+    </script>    
+}
